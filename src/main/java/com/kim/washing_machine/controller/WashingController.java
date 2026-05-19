@@ -32,6 +32,13 @@ public class WashingController {
                 .body(washingService.readWashing());
     }
 
+    @GetMapping("/washing/yet")
+    public ResponseEntity<List<ReadWashingResponse>> readYetWashing() {
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(washingService.readYetWashing());
+    }
+
     @GetMapping("/washing/position/{position}")
     public ResponseEntity<List<ReadWashingResponse>> findPositionWashing(@PathVariable int position) {
         return ResponseEntity
@@ -58,18 +65,18 @@ public class WashingController {
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
-    @DeleteMapping("/washing/reset")
-    public ResponseEntity<String> resetWashing() {
-        String response = washingService.resetWashing();
-        return ResponseEntity.status(HttpStatus.OK).body(response);
-    }
-
     @DeleteMapping("/washing/delete/done")
     public ResponseEntity<String> deleteDoneWashing() {
         String response = washingService.deleteDoneWashing(true);
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(response);
+    }
+
+    @DeleteMapping("/washing/reset")
+    public ResponseEntity<String> resetWashing() {
+        String response = washingService.resetWashing();
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     // @PathVariable: url에서 값을 받아옴

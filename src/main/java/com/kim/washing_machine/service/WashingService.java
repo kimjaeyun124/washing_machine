@@ -38,6 +38,16 @@ public class WashingService {
         return ReadWashingResponse.fromList(washings);
     }
 
+    public List<ReadWashingResponse> readYetWashing() {
+        List<Washing> washings = washingRepository.findByDone(false);
+
+        if (washings.isEmpty()) {
+            throw new NoSuchElementException("현재 대기 중인 세탁이 없습니다.");
+        }
+
+        return ReadWashingResponse.fromList(washings);
+    }
+
     public List<ReadWashingResponse> searchPositionWashing(int position) {
         List<Washing> washings = washingRepository.findByPosition(position);
 
@@ -73,16 +83,6 @@ public class WashingService {
         return washing.getRoom() + "호 예약이 취소되었습니다.";
     }
 
-    public String resetWashing() {
-        if (washingRepository.count() == 0) {
-            throw new NoSuchElementException("삭제할 예약이 없습니다.");
-        }
-
-        washingRepository.deleteAll();
-        washingRepository.resetAutoIncrement();
-        return "예약을 초기화 했습니다.";
-    }
-
     public String deleteDoneWashing(boolean done) {
         List<Washing> washings = washingRepository.findByDone(done);
 
@@ -93,5 +93,15 @@ public class WashingService {
         washingRepository.deleteAll(washings);
 
         return "완료된 예약을 삭제했습니다.";
+    }
+
+    public String resetWashing() {
+        if (washingRepository.count() == 0) {
+            throw new NoSuchElementException("삭제할 예약이 없습니다.");
+        }
+
+        washingRepository.deleteAll();
+        washingRepository.resetAutoIncrement();
+        return "예약을 초기화 했습니다.";
     }
 }
