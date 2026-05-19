@@ -17,5 +17,7 @@ public interface WashingRepository extends JpaRepository<Washing, Long> {
 
     List<Washing> findByRoom(String room);
 
+    List<Washing> findByDone(boolean done);
+
     // List<Washing>: Washing 객체만 있는 List
 }

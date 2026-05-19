@@ -64,5 +64,13 @@ public class WashingController {
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
+    @DeleteMapping("/washing/delete/done")
+    public ResponseEntity<String> deleteDoneWashing() {
+        String response = washingService.deleteDoneWashing(true);
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(response);
+    }
+
     // @PathVariable: url에서 값을 받아옴
 }

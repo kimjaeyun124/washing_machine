@@ -82,4 +82,16 @@ public class WashingService {
         washingRepository.resetAutoIncrement();
         return "예약을 초기화 했습니다.";
     }
+
+    public String deleteDoneWashing(boolean done) {
+        List<Washing> washings = washingRepository.findByDone(done);
+
+        if (washings.isEmpty()) {
+            throw new NoSuchElementException("완료된 예약이 없습니다.");
+        }
+
+        washingRepository.deleteAll(washings);
+
+        return "완료된 예약을 삭제했습니다.";
+    }
 }
