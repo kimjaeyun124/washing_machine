@@ -19,7 +19,7 @@ public class WashingController {
 
     @PostMapping("/washing")
     public ResponseEntity<CreateWashingResponse> createWashing(
-            @RequestBody @Valid CreateWashingRequest request
+            @RequestBody @Valid CreateWashingRequest request // RequestBody는 요청에서 json 데이터를 꺼내서 CreateWashingRequest 객체로 자동 변환
     ) {
         CreateWashingResponse response = washingService.createWashing(request); // 데이터 받음
         return ResponseEntity.status(HttpStatus.CREATED).body(response); // 응답 코드 보냄
@@ -64,4 +64,5 @@ public class WashingController {
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
+    // @PathVariable: url에서 값을 받아옴
 }

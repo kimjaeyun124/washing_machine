@@ -14,7 +14,7 @@ import java.util.NoSuchElementException;
 
 @Service
 @Transactional(rollbackOn = Exception.class) // Exception의 하위 클레스에서 예외인 모든 상황에서 모두 취소 한다
-@RequiredArgsConstructor // 생성자 자동 제작 final이 붙어 있는 함수의
+@RequiredArgsConstructor // final이 붙어 있는 함수의 생성자 자동 제작
 public class WashingService {
     private final WashingRepository washingRepository;
 
@@ -44,7 +44,7 @@ public class WashingService {
         if (washings.isEmpty()) {
             throw new NoSuchElementException("예약이 없습니다.");
         }
-        String[] pos = {"3층 실습동편", "3층 실습동 반대편", "4층 실습동편", "4층 실습동 반대편", "5층 실습동편", "5층 실습동 반대편"};
+
         return ReadWashingResponse.fromList(washings);
     }
 
@@ -67,7 +67,7 @@ public class WashingService {
 
     public String deleteWashing(Long id) {
         Washing washing = washingRepository.findById(id)
-                .orElseThrow(() -> new NoSuchElementException("예약이 안되어 있습니다."));
+                .orElseThrow(() -> new NoSuchElementException("예약이 안되어 있습니다.")); // 값이 없을 떄
         washingRepository.deleteById(id);
 
         return washing.getRoom() + "호 예약이 취소되었습니다.";
