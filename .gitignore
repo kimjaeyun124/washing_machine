@@ -5,6 +5,19 @@ build/
 !**/src/main/**/build/
 !**/src/test/**/build/
 
+# 환경변수 파일 (DB 비밀번호 등 민감한 정보)
+.env
+
+# 빌드 결과물
+out/
+
+# IntelliJ 설정 파일
+.idea/
+*.iml
+
+# Gradle
+.gradle/
+
 ### STS ###
 .apt_generated
 .classpath
@@ -38,7 +51,6 @@ out/
 
 ### Spring Boot Settings ###
 src/main/resources/application.yaml
-src/main/resources/application.yml
 
 washing.txt
 

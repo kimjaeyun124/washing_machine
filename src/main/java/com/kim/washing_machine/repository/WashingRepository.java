@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface WashingRepository extends JpaRepository<Washing, Long> {
 
@@ -15,7 +16,7 @@ public interface WashingRepository extends JpaRepository<Washing, Long> {
 
     List<Washing> findByPosition(int position);
 
-    List<Washing> findByRoom(String room);
+    Optional<List<Washing>> findByRoom(String room);
 
     List<Washing> findByDone(boolean done);
 

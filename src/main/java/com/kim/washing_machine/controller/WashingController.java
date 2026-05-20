@@ -13,11 +13,12 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
+@RequestMapping("/washing")
 @RequiredArgsConstructor
 public class WashingController {
     private final WashingService washingService;
 
-    @PostMapping("/washing")
+    @PostMapping
     public ResponseEntity<CreateWashingResponse> createWashing(
             @RequestBody @Valid CreateWashingRequest request // RequestBody는 요청에서 json 데이터를 꺼내서 CreateWashingRequest 객체로 자동 변환
     ) {

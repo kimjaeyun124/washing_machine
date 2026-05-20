@@ -59,11 +59,12 @@ public class WashingService {
     }
 
     public List<ReadWashingResponse> searchRoomWashing(String room) {
-        List<Washing> washing = washingRepository.findByRoom(room);
+        List<Washing> washing = washingRepository.findByRoom(room)
+                .orElseThrow(() -> new NoSuchElementException("에약을 찾을 수 없습니다."));
 
-        if (washing.isEmpty()) {
-            throw new NoSuchElementException("에약을 찾을 수 없습니다.");
-        }
+//        if (washing.isEmpty()) {
+//            throw new NoSuchElementException("에약을 찾을 수 없습니다.");
+//        }
 
         return ReadWashingResponse.fromList(washing);
     }
