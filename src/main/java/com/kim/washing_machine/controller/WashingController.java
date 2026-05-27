@@ -20,39 +20,31 @@ public class WashingController {
     private final WashingService washingService;
 
     @PostMapping
-    public ResponseEntity<CreateWashingResponse> createWashing(
-            @RequestBody @Valid CreateWashingRequest request // RequestBody는 요청에서 json 데이터를 꺼내서 CreateWashingRequest 객체로 자동 변환
+    public ResponseEntity<ApiResponse<CreateWashingResponse>> createWashing(
+            @RequestBody @Valid CreateWashingRequest request
     ) {
-        CreateWashingResponse response = washingService.createWashing(request); // 데이터 받음
-        return ResponseEntity.status(HttpStatus.CREATED).body(response); // 응답 코드 보냄
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(ApiResponse.ok(washingService.createWashing(request)));
     }
 
     @GetMapping
-    public ResponseEntity<List<ReadWashingResponse>> readWashing() {
-        return ResponseEntity
-                .status(HttpStatus.OK)
-                .body(washingService.readWashing());
+    public ResponseEntity<ApiResponse<List<ReadWashingResponse>>> readWashing() {
+        return ResponseEntity.ok(ApiResponse.ok(washingService.readWashing()));
     }
 
     @GetMapping("/yet")
-    public ResponseEntity<List<ReadWashingResponse>> readYetWashing() {
-        return ResponseEntity
-                .status(HttpStatus.OK)
-                .body(washingService.readYetWashing());
+    public ResponseEntity<ApiResponse<List<ReadWashingResponse>>> readYetWashing() {
+        return ResponseEntity.ok(ApiResponse.ok(washingService.readYetWashing()));
     }
 
     @GetMapping("/position/{position}")
-    public ResponseEntity<List<ReadWashingResponse>> findPositionWashing(@PathVariable int position) {
-        return ResponseEntity
-                .status(HttpStatus.OK)
-                .body(washingService.searchPositionWashing(position));
+    public ResponseEntity<ApiResponse<List<ReadWashingResponse>>> findPositionWashing(@PathVariable int position) {
+        return ResponseEntity.ok(ApiResponse.ok(washingService.searchPositionWashing(position)));
     }
 
     @GetMapping("/room/{room}")
-    public ResponseEntity<List<ReadWashingResponse>> findRoomWashing(@PathVariable String room) {
-        return ResponseEntity
-                .status(HttpStatus.OK)
-                .body(washingService.searchRoomWashing(room));
+    public ResponseEntity<ApiResponse<List<ReadWashingResponse>>> findRoomWashing(@PathVariable String room) {
+        return ResponseEntity.ok(ApiResponse.ok(washingService.searchRoomWashing(room)));
     }
 
     @PatchMapping("/finish/{id}")
