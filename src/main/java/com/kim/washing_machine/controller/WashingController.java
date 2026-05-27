@@ -1,5 +1,6 @@
 package com.kim.washing_machine.controller;
 
+import com.kim.washing_machine.common.ApiResponse;
 import com.kim.washing_machine.dto.request.CreateWashingRequest;
 import com.kim.washing_machine.dto.response.CreateWashingResponse;
 import com.kim.washing_machine.dto.response.ReadWashingResponse;
@@ -26,58 +27,55 @@ public class WashingController {
         return ResponseEntity.status(HttpStatus.CREATED).body(response); // 응답 코드 보냄
     }
 
-    @GetMapping("/washing")
+    @GetMapping
     public ResponseEntity<List<ReadWashingResponse>> readWashing() {
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(washingService.readWashing());
     }
 
-    @GetMapping("/washing/yet")
+    @GetMapping("/yet")
     public ResponseEntity<List<ReadWashingResponse>> readYetWashing() {
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(washingService.readYetWashing());
     }
 
-    @GetMapping("/washing/position/{position}")
+    @GetMapping("/position/{position}")
     public ResponseEntity<List<ReadWashingResponse>> findPositionWashing(@PathVariable int position) {
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(washingService.searchPositionWashing(position));
     }
 
-    @GetMapping("/washing/room/{room}")
+    @GetMapping("/room/{room}")
     public ResponseEntity<List<ReadWashingResponse>> findRoomWashing(@PathVariable String room) {
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(washingService.searchRoomWashing(room));
     }
 
-    @PatchMapping("/washing/finish/{id}")
-    public ResponseEntity<String> finishWashing(@PathVariable Long id) {
-        String response = washingService.finishWashing(id);
-        return ResponseEntity.status(HttpStatus.OK).body(response);
+    @PatchMapping("/finish/{id}")
+    public ResponseEntity<ApiResponse<ReadWashingResponse>> finishWashing(@PathVariable Long id) {
+        return ResponseEntity.ok(ApiResponse.ok(washingService.finishWashing(id)));
     }
 
-    @DeleteMapping("/washing/delete/{id}")
+    @DeleteMapping("/delete/{id}")
     public ResponseEntity<String> deleteWashing(@PathVariable Long id) {
-        String response = washingService.deleteWashing(id);
-        return ResponseEntity.status(HttpStatus.OK).body(response);
+        washingService.deleteWashing(id);
+        return ResponseEntity.noContent().build();
     }
 
-    @DeleteMapping("/washing/delete/done")
+    @DeleteMapping("/delete/done")
     public ResponseEntity<String> deleteDoneWashing() {
-        String response = washingService.deleteDoneWashing(true);
-        return ResponseEntity
-                .status(HttpStatus.OK)
-                .body(response);
+        washingService.deleteDoneWashing();
+        return ResponseEntity.noContent().build();
     }
 
-    @DeleteMapping("/washing/reset")
-    public ResponseEntity<String> resetWashing() {
-        String response = washingService.resetWashing();
-        return ResponseEntity.status(HttpStatus.OK).body(response);
+    @DeleteMapping("/reset")
+    public ResponseEntity<Void> resetWashing() {
+        washingService.resetWashing();
+        return ResponseEntity.noContent().build();
     }
 
     // @PathVariable: url에서 값을 받아옴

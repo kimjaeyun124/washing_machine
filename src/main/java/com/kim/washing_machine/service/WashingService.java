@@ -4,13 +4,15 @@ import com.kim.washing_machine.dto.request.CreateWashingRequest;
 import com.kim.washing_machine.dto.response.CreateWashingResponse;
 import com.kim.washing_machine.dto.response.ReadWashingResponse;
 import com.kim.washing_machine.entity.Washing;
+import com.kim.washing_machine.exception.ErrorCode;
+import com.kim.washing_machine.exception.WashingException;
 import com.kim.washing_machine.repository.WashingRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.NoSuchElementException;
+import java.util.Optional;
 
 @Service
 @Transactional(rollbackOn = Exception.class) // Exception의 하위 클레스에서 예외인 모든 상황에서 모두 취소 한다
@@ -19,90 +21,74 @@ public class WashingService {
     private final WashingRepository washingRepository;
 
     public CreateWashingResponse createWashing(CreateWashingRequest request) {
-        Washing washing = Washing.builder()
-                .room(request.room())
-                .position(request.position())
-                .build();
-        String[] pos = {"3층 실습동편", "3층 실습동 반대편", "4층 실습동편", "4층 실습동 반대편", "5층 실습동편", "5층 실습동 반대편"};
-        washingRepository.save(washing);
-        return new CreateWashingResponse(washing.getRoom() + "호, " + pos[washing.getPosition() - 1] +" 위치 예약되었습니다.");
+        return CreateWashingResponse.of(
+                washingRepository.save(
+                        Washing.builder()
+                                .room(request.room())
+                                .position(request.position())
+                                .build()
+                )
+        );
     }
 
     public List<ReadWashingResponse> readWashing() {
-        List<Washing> washings = washingRepository.findAll();
-
-        if (washings.isEmpty()) {
-            throw new NoSuchElementException("현재 대기 중인 세탁이 없습니다.");
-        }
-
-        return ReadWashingResponse.fromList(washings);
+        return ReadWashingResponse.fromList(
+                Optional.of(washingRepository.findAll())
+                        .filter(list -> !list.isEmpty())
+                        .orElseThrow(() -> new WashingException(ErrorCode.WASHING_LIST_EMPTY))
+        );
     }
 
     public List<ReadWashingResponse> readYetWashing() {
-        List<Washing> washings = washingRepository.findByDone(false);
-
-        if (washings.isEmpty()) {
-            throw new NoSuchElementException("현재 대기 중인 세탁이 없습니다.");
-        }
-
-        return ReadWashingResponse.fromList(washings);
+        return ReadWashingResponse.fromList(
+                Optional.of(washingRepository.findByDone(false))
+                        .filter(list -> !list.isEmpty())
+                        .orElseThrow(() -> new WashingException(ErrorCode.WASHING_LIST_EMPTY))
+        );
     }
 
     public List<ReadWashingResponse> searchPositionWashing(int position) {
-        List<Washing> washings = washingRepository.findByPosition(position);
-
-        if (washings.isEmpty()) {
-            throw new NoSuchElementException("예약이 없습니다.");
-        }
-
-        return ReadWashingResponse.fromList(washings);
+        return ReadWashingResponse.fromList(
+                Optional.of(washingRepository.findByPosition(position))
+                        .filter(list -> !list.isEmpty())
+                        .orElseThrow(() -> new WashingException(ErrorCode.WASHING_NOT_FOUND))
+        );
     }
 
     public List<ReadWashingResponse> searchRoomWashing(String room) {
-        List<Washing> washing = washingRepository.findByRoom(room)
-                .orElseThrow(() -> new NoSuchElementException("에약을 찾을 수 없습니다."));
-
-//        if (washing.isEmpty()) {
-//            throw new NoSuchElementException("에약을 찾을 수 없습니다.");
-//        }
-
-        return ReadWashingResponse.fromList(washing);
+        return ReadWashingResponse.fromList(
+                Optional.of(washingRepository.findByRoom(room))
+                        .filter(list -> !list.isEmpty())
+                        .orElseThrow(() -> new WashingException(ErrorCode.WASHING_NOT_FOUND))
+        );
     }
 
-    public String finishWashing(Long id) {
+    public ReadWashingResponse finishWashing(Long id) {
         Washing washing = washingRepository.findById(id)
-                .orElseThrow(() -> new NoSuchElementException("예약을 찾을 수 없습니다."));
+                .orElseThrow(() -> new WashingException(ErrorCode.WASHING_NOT_FOUND));
         washing.finishWashing();
-        return washing.getRoom() + "호 세탁이 완료되었습니다.";
+        return ReadWashingResponse.of(washing);
     }
 
-    public String deleteWashing(Long id) {
-        Washing washing = washingRepository.findById(id)
-                .orElseThrow(() -> new NoSuchElementException("예약이 안되어 있습니다.")); // 값이 없을 떄
-        washingRepository.deleteById(id);
-
-        return washing.getRoom() + "호 예약이 취소되었습니다.";
+    public void deleteWashing(Long id) {
+        washingRepository.deleteById(
+                washingRepository.findById(id)
+                        .orElseThrow(() -> new WashingException(ErrorCode.WASHING_NOT_FOUND))
+                        .getId()
+        );
     }
 
-    public String deleteDoneWashing(boolean done) {
-        List<Washing> washings = washingRepository.findByDone(done);
-
-        if (washings.isEmpty()) {
-            throw new NoSuchElementException("완료된 예약이 없습니다.");
-        }
-
-        washingRepository.deleteAll(washings);
-
-        return "완료된 예약을 삭제했습니다.";
+    public void deleteDoneWashing() {
+        washingRepository.deleteAll(
+                Optional.of(washingRepository.findByDone(true))
+                        .filter(list -> !list.isEmpty())
+                        .orElseThrow(() -> new WashingException(ErrorCode.WASHING_DONE_EMPTY))
+        );
     }
 
-    public String resetWashing() {
-        if (washingRepository.count() == 0) {
-            throw new NoSuchElementException("삭제할 예약이 없습니다.");
-        }
-
-        washingRepository.deleteAll();
-        washingRepository.resetAutoIncrement();
-        return "예약을 초기화 했습니다.";
+    public void resetWashing() {
+        Optional.of(washingRepository.findAll())
+                .filter(list -> !list.isEmpty())
+                .orElseThrow(() -> new WashingException(ErrorCode.WASHING_RESET_EMPTY));
     }
 }
